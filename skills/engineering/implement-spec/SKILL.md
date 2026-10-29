@@ -30,7 +30,7 @@ You build the spec yourself, in this session. Your context is the asset: when th
 4. Run tickets in parallel only when the frontier holds two or more sizable tickets that are independent and touch disjoint files. Small or overlapping tickets stay sequential in this session. For a parallel batch:
    - Build one of the tickets yourself, and hand each of the others to `acp_delegate` with agent `worker`.
    - Give each worker its own git worktree on its own branch, cut from the integration branch tip, and pass the worktree as `cwd`.
-   - Brief each worker with findings, not pointers: the ticket, its decisions, the `file:line` locations and conventions it needs. A worker should read only the files it edits. Ask it to build with the `tdd` skill and to report its branch, commit, test status, and anything surprising.
+   - Brief each worker with findings, not pointers, but only findings you already have: the ticket, its decisions, and whatever `file:line` locations and conventions you already know for it. Don't read files just to write a brief: the worker reads the files it edits anyway, so reading them first only doubles the work. Ask it to build with the `tdd` skill and to report its branch, commit, test status, and anything surprising.
    - Don't touch a worker's ticket or files while it runs.
    - When a worker reports, merge its branch into the integration branch yourself, resolve any conflicts, and fold the ticket as in step 3.
 
