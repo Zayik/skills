@@ -14,7 +14,9 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+Work from whatever is already in the conversation context. If billion-context has folded earlier parts of this session (fold summaries stand in for the original turns), the live context shows summaries, not the decisions as they were made. Then, before you write, recover them: run `search_context` (it searches the fold summaries) for each topic the breakdown covers, and where exact wording matters `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need, so the breakdown carries what was decided rather than a summary of it. If nothing is folded yet, the decisions are already in front of you: skip the recovery. Either way, don't re-read files or re-ask the user for anything this session already holds. If those tools are missing, billion-context isn't running: tell the user.
+
+If the user passes a reference (a spec path, an issue number or URL) as an argument and it is not already in this session, fetch it and read its full body and comments.
 
 ### 2. Explore the codebase (optional)
 

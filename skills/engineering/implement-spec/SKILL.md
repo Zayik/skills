@@ -12,29 +12,30 @@ The goal is the entire spec implemented on a single **integration branch**, with
 
 The tickets are not a list of steps. They are a **task graph** with blocking relationships between them. This means there is always a **frontier** of tickets which are ready to be grabbed.
 
-Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
-
-**Implementer subagents** should be run in the background where possible for maximum concurrency.
+You build the spec yourself, in this session. Your context is the asset: when the spec was planned in this session, you already hold the reasoning behind every ticket, and billion-context keeps it recoverable as it folds what is consumed. Don't hand reading or tickets to sub-agents that would have to rebuild that context. If `search_context` and `decompress` are missing, billion-context isn't running: tell the user.
 
 ## Steps
 
-1. Read the spec and tickets to understand the task graph.
+1. Understand the task graph from the spec and tickets. If they were written in this session, recover them from context (`search_context`, then `decompress` what you need) and read only what isn't there. Otherwise read them from the tracker.
 
-2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, accessible by all future subagents. This lets **implementer subagents** focus on implementation rather than exploration.
+2. Create the integration branch. If the issue tracker closes work through PRs, or the user asks for one, open a draft PR after the first ticket lands (a branch with no commits ahead of main can't open one), marked as closing the spec and tickets.
 
-3. Create the integration branch. If the issue tracker closes work through PRs, or the user asks for one, open a draft PR after the first merge in step 5 (a branch with no commits ahead of main can't open one), marked as closing the spec and tickets.
+3. Work the frontier one ticket at a time, in this session. For each ticket:
+   - Recover what you already know: its decisions from the grilling and the spec, and any earlier reading of the code it touches. `search_context` searches the fold summaries, so start there. When you need exact wording, `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need. A restore lands in this ticket's part of the session, so the ticket's fold covers it; don't fold it separately.
+   - Read only what is missing or stale. A file that changed since you read it (`git diff`, `git log`) is read again, never edited from a folded copy.
+   - Load the `tdd` skill and build the ticket with it.
+   - Commit to the integration branch.
+   - Fold the finished ticket with `compress`: one summary naming the commit, what changed, decisions made while building, and gotchas. Don't fold in the middle of a ticket unless billion-context nudges you to.
 
-4. Use **implementer subagents** to implement each ticket, each in its own worktree on its own branch. Each implementer subagent:
-   - confirms its worktree is based on the integration branch before starting, and resets onto it if not;
-   - calls the Skill tool with `tdd` to build the ticket;
-   - merges the integration branch tip into its own branch before reporting done
+4. Run tickets in parallel only when the frontier holds two or more sizable tickets that are independent and touch disjoint files. Small or overlapping tickets stay sequential in this session. For a parallel batch:
+   - Build one of the tickets yourself, and hand each of the others to `acp_delegate` with agent `worker`.
+   - Give each worker its own git worktree on its own branch, cut from the integration branch tip, and pass the worktree as `cwd`.
+   - Brief each worker with findings, not pointers, but only findings you already have: the ticket, its decisions, and whatever `file:line` locations and conventions you already know for it. Don't read files just to write a brief: the worker reads the files it edits anyway, so reading them first only doubles the work. Ask it to build with the `tdd` skill and to report its branch, commit, test status, and anything surprising.
+   - Don't touch a worker's ticket or files while it runs.
+   - When a worker reports, merge its branch into the integration branch yourself, resolve any conflicts, and fold the ticket as in step 3.
 
-5. Once an **implementer subagent** completes, merge its work to the integration branch with a **merger subagent**.
+5. Once all tickets are complete, load the `code-review` skill and run it on the integration branch. Fix the issues it raises yourself.
 
-6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
+6. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
 
-7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single **implementer subagent**.
-
-8. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
-
-9. Clean up all **implementer subagent** worktrees.
+7. Remove any worker worktrees.

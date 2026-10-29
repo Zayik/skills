@@ -23,7 +23,7 @@ Reach for it when the build is too big for one agent [session](https://www.aiher
 
 ## The spec is a decision record
 
-The spec exists because context windows end. You settled many things while [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling): the shape of the solution, the choices you argued through, and what you deliberately refused. All of that is in one conversation that you are about to clear. The spec keeps it.
+The spec exists because context windows end. You settled many things while [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling): the shape of the solution, the choices you argued through, and what you deliberately refused. All of that is in one conversation. billion-context keeps the conversation lean by folding what is consumed, so by now much of it is summaries in the live context, with the originals still recoverable. The skill recovers the folded decisions with `search_context` before it writes, and the spec keeps them intact for every session after this one.
 
 So the spec does not validate or decide anything. It records what you decided, in your project's own vocabulary, so a fresh session can pick up the work without you explaining it again. If the spec states something you never said, that is a defect.
 
