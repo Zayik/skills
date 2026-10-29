@@ -19,12 +19,14 @@ Anthropic's "Building agents: When to fold subagents into your main agent loop":
   - `/code-review`: two `reviewer` delegates in parallel.
   - `/handoff`: unchanged, for portability only.
 - **No new triggers.** Nothing hands off or compacts automatically. bili handles context growth.
+- **Recovering folded context.** `search_context` searches fold summaries, so it comes first, and only when something has been folded. Exact wording comes from restoring just the range needed, or a block written to a file and read selectively. A restore lands as a tool result inside the current work, so the next fold absorbs it; nothing is folded twice.
+- **Briefs.** A delegate is briefed only with findings already in hand; the main agent never reads files just to write a brief. Reviewers are told `AGENTS.md` and `CLAUDE.md` are already in their context.
 
 ## Scope
 
-Adapted: `grill-with-docs`, `grilling`, `to-spec`, `to-tickets`, `implement`, `implement-spec`, `tdd`, `code-review`, `handoff`, `ask-matt` (with `PHASE-BOUNDARIES.md`), and their docs pages. `domain-modeling` needed no change.
+Adapted: `grill-with-docs`, `grill-me`, `grilling`, `to-spec`, `to-tickets`, `implement`, `implement-spec`, `tdd`, `code-review`, `handoff`, `ask-matt` (with `PHASE-BOUNDARIES.md`), and their docs pages. `domain-modeling` needed no change.
 
-Not adapted, still carrying Claude Code wording: `research`, `retro`, `triage`, `wayfinder`, `codebase-design`, `improve-codebase-architecture`, `grill-me`, `writing-for-agents`, and the `in-progress/` and `misc/` skills. `ask-matt` still routes to `research`, which describes a background agent.
+Not adapted, still carrying Claude Code wording: `research`, `retro`, `triage`, `wayfinder`, `codebase-design`, `improve-codebase-architecture`, `writing-for-agents`, and the `in-progress/` and `misc/` skills. `ask-matt` still routes to `research`, which describes a background agent.
 
 ## Consequences
 
