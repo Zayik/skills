@@ -10,6 +10,8 @@ You don't remember every skill, so ask.
 
 Before stating what a skill does or recommending a step be skipped, read that skill's SKILL.md: the summaries here are for orientation only.
 
+This map assumes pi with billion-context loaded. In pi, each `/<name>` below is typed as `/skill:<name>`.
+
 A **flow** is a path through the skills. Most paths run along one **main flow**, and two **on-ramps** merge onto it. Everything else is standalone, or a vocabulary layer that runs underneath.
 
 ## The main flow: idea → ship
@@ -23,11 +25,11 @@ The route most work travels. You have an idea and want it built.
    - **`/handoff`** back what you learned, and reference it from the original idea thread.
 3. **Branch: is this a multi-session build?**
    - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. Then work the tickets one of two ways:
-     - **`/implement`** per ticket, **`/clear`ing context between each one**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed. Each ticket is self-contained, so the last one's context is disposable.
-     - **`/implement-spec`** for the whole spec in one run. It reads the tickets as a **task graph**, runs implementer subagents across the ready **frontier** in parallel, and lands everything on one **integration branch**. Reach for it when you'd rather orchestrate the build than drive each ticket yourself.
+     - **`/implement`** per ticket. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed. Continuing in the same session between tickets is the default: billion-context folds each finished ticket and the next one recovers what it needs instead of re-reading. Start a ticket with **`/new`** when you want it isolated.
+     - **`/implement-spec`** for the whole spec in one run, ideally in the session that planned it. It reads the tickets as a **task graph** and builds the ready **frontier** itself in one main loop, folding each finished ticket, and lands everything on one **integration branch**. It hands tickets to parallel `worker` delegates only when they are sizable and touch disjoint files. Reach for it when you'd rather have the agent drive the build than drive each ticket yourself.
    - **No** → **`/implement`** right here, in the same context window.
 
-   Either way, the code gets built by driving **`/tdd`** (one red-green slice at a time) and closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff. `/implement` runs both per ticket; `/implement-spec`'s implementers each drive `/tdd`, and it runs one `/code-review` over the integration branch. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
+   Either way, the code gets built by driving **`/tdd`** (one red-green slice at a time) and closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff. `/implement` runs both per ticket; `/implement-spec` drives `/tdd` per ticket and runs one `/code-review` over the integration branch. `/code-review` runs its two axes as parallel `reviewer` delegates, so its review is independent even from the session that wrote the code. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
 
    When the work goes up as a pull request, **`/pr`** shapes the body: the smallest visual that shows the change, before/after evidence that it works, and a one-way or two-way door call. It's model-invoked, so the agent reaches for it whenever it writes a PR.
 
@@ -35,9 +37,9 @@ The route most work travels. You have an idea and want it built.
 
 ### Context hygiene
 
-Keep steps 1–3 in **one unbroken context window** (don't compact or clear until after `/to-tickets`) so the grilling, spec, and tickets all build on the same thinking. Each `/implement` then starts fresh, working from the ticket. Run `/retro` in the session it's looking back on, before you clear; after clearing, point it at that session's log instead.
+Keep steps 1–3 in **one unbroken session** (don't start a `/new` one until after `/to-tickets`) so the grilling, spec, and tickets all build on the same thinking. `/implement-spec` then continues in that same session; `/implement` can too, or start each ticket with `/new` for isolation. Run `/retro` in the session it's looking back on; from a new session, point it at that session's log instead.
 
-The limit on this is the **[smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone)**: the window (~150k tokens on state-of-the-art models) within which the model still reasons sharply. If a session approaches it before `/to-tickets`, don't push on degraded; `/compact` at the nearest phase boundary and carry on (see Phase boundaries).
+The old limit on this was the **[smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone)** (~150k tokens). billion-context moves it: it folds consumed context into summaries and keeps the originals recoverable, so the live window stays small and `/to-spec` and `/to-tickets` recover the exact decisions from folds before they write. If the agent still visibly degrades (re-asking settled questions, contradicting decisions), fold the finished phase at the nearest boundary, or start a `/new` session from the spec (see Phase boundaries).
 
 ## On-ramps
 
@@ -70,13 +72,13 @@ Two model-invoked references that run *beneath* the other skills, each the singl
 
 A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. At the **boundary** between two of them you have five options, and picking between them is the fuzziest decision in this whole map:
 
-- **Continue**: stay put. Costs nothing, loses nothing.
-- **`/clear`**: empty the window, when nothing here matters to what's next.
+- **Continue**: stay put. Costs nothing, loses nothing; billion-context folds as you go.
+- **`/new`**: start a new session, when nothing here matters to what's next or you want isolation.
 - **`/handoff`** writes a portable markdown file. Narrow: only for a **new harness**, a **new directory**, a **colleague**, or forking a side task **mid-phase**. What it buys is portability.
-- **Subagent**: send a tightly-scoped task to its own window and get a report back.
-- **`/compact`** compresses this context and seeds a fresh session with it. The **default**, at the bottom of the tree rather than the first reach.
+- **Delegate**: send a tightly scoped task to an `acp_delegate` delegate and get a compact reply back. Only for an independent review, a large disposable lookup, or parallel edits on disjoint files.
+- **Fold**: compress the finished phase with billion-context's `compress`, then continue. The **default** when you stay, at the bottom of the tree. It keeps each range recoverable; pi's `/compact`, which replaces the whole history with one summary, isn't used.
 
-Read [PHASE-BOUNDARIES.md](PHASE-BOUNDARIES.md) for the ordered tree: the five questions, the reasoning behind each branch, and why the primary-source cost makes **Continue** the one to rule out first. Make the decision **at** a boundary; mid-phase, continue or split the rest into subagents.
+Read [PHASE-BOUNDARIES.md](PHASE-BOUNDARIES.md) for the ordered tree: the five questions, the reasoning behind each branch, and why the primary-source cost makes **Continue** the one to rule out first. Make the decision **at** a boundary; mid-phase, continue.
 
 ## Standalone
 
