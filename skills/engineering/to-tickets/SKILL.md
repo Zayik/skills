@@ -14,7 +14,9 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+Work from whatever is already in the conversation context. A long grilling session is usually partly folded by billion-context by now: the live context shows summaries, not the decisions as they were made. Before you write, recover them: run `search_context` for each topic the breakdown covers and `decompress` the ranges whose exact wording matters, so the breakdown carries what was decided rather than a summary of it. Don't re-read files or re-ask the user for anything this session already holds. If those tools are missing, billion-context isn't running: tell the user.
+
+If the user passes a reference (a spec path, an issue number or URL) as an argument and it is not already in this session, fetch it and read its full body and comments.
 
 ### 2. Explore the codebase (optional)
 
