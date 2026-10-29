@@ -7,9 +7,11 @@ disable-model-invocation: true
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows) - not the current workspace.
 
-Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
+Include a "suggested skills" section in the document, naming which skills the next session should load (`/skill:<name>` in pi).
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
+
+billion-context's folded context does not travel with the file. If a decision or finding the next session needs has been folded, recover it with `search_context` (and `decompress` for its exact wording) and write it into the document.
 
 Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 
