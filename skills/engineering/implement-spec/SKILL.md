@@ -21,7 +21,7 @@ You build the spec yourself, in this session. Your context is the asset: when th
 2. Create the integration branch. If the issue tracker closes work through PRs, or the user asks for one, open a draft PR after the first ticket lands (a branch with no commits ahead of main can't open one), marked as closing the spec and tickets.
 
 3. Work the frontier one ticket at a time, in this session. For each ticket:
-   - Recover what you already know: its decisions from the grilling and the spec, and any earlier reading of the code it touches. Use narrow `search_context` queries, `decompress` only the ranges you need, and fold them again when you are done.
+   - Recover what you already know: its decisions from the grilling and the spec, and any earlier reading of the code it touches. `search_context` searches the fold summaries, so start there. When you need exact wording, `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need. A restore lands in this ticket's part of the session, so the ticket's fold covers it; don't fold it separately.
    - Read only what is missing or stale. A file that changed since you read it (`git diff`, `git log`) is read again, never edited from a folded copy.
    - Load the `tdd` skill and build the ticket with it.
    - Commit to the integration branch.

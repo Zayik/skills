@@ -10,7 +10,7 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 ## Process
 
-1. Recover what this session already decided. A long grilling session is usually partly folded by billion-context by now: the live context shows summaries, not the decisions as they were made. Before you write, recover them: run `search_context` for each topic the spec covers and `decompress` the ranges whose exact wording matters, so the spec carries what was decided rather than a summary of it. Don't re-read files or re-ask the user for anything this session already holds. If those tools are missing, billion-context isn't running: tell the user.
+1. Recover what this session already decided. A long grilling session is usually partly folded by billion-context by now: the live context shows summaries, not the decisions as they were made. Before you write, recover them: run `search_context` (it searches the fold summaries) for each topic the spec covers, and where exact wording matters `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need, so the spec carries what was decided rather than a summary of it. Don't re-read files or re-ask the user for anything this session already holds. If those tools are missing, billion-context isn't running: tell the user.
 
    Then explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 

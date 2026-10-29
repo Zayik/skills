@@ -8,7 +8,7 @@ Implement one unit of work described by the user: a single ticket, or small work
 
 If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
 
-Work from what this session already holds. If the planning happened here, billion-context may have folded its decisions and your earlier reading of the code: recover them with `search_context` (and `decompress` the ranges you need) instead of re-reading. Read a file again only when it is missing from context or has changed since you read it (`git diff`, `git log`). If those tools are missing, billion-context isn't running: tell the user.
+Work from what this session already holds. If the planning happened here, billion-context may have folded its decisions and your earlier reading of the code: recover them with `search_context`, which searches the fold summaries, instead of re-reading. When you need exact wording, `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need. Read a file again only when it is missing from context or has changed since you read it (`git diff`, `git log`). If those tools are missing, billion-context isn't running: tell the user.
 
 Build it yourself, in this session; don't hand any of the build to `acp_delegate`. (The review at the end runs its own reviewers.)
 
