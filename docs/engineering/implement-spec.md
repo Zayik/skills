@@ -2,7 +2,7 @@
 
 `implement-spec` takes a [spec](https://www.aihero.dev/ai-coding-dictionary/spec) and its [tickets](https://www.aihero.dev/ai-coding-dictionary/ticket) and lands the whole thing in one run, on a single **integration branch**. One [agent](https://www.aihero.dev/ai-coding-dictionary/agent) builds every ticket itself, in the same [session](https://www.aihero.dev/ai-coding-dictionary/session) that planned the spec, then runs [code-review](https://aihero.dev/skills-code-review) over the result and resolves the tickets.
 
-It builds in **one main loop**, because that session already holds the reasoning behind every ticket. Handing tickets to fresh subagents would make each of them re-read what the main agent already knows. billion-context keeps the long run lean: each finished ticket is folded into a summary, and the decisions and earlier reading of the code stay recoverable with `search_context` when a later ticket needs them. It still reads the tickets as a **task graph**, not a list: blocking edges decide what can start, so there is always a **frontier** of tickets whose blockers have landed.
+It builds in **one main loop**, because that session already holds the reasoning behind every ticket. Handing tickets to fresh subagents would make each of them re-read what the main agent already knows. billion-context keeps the long run lean on its own, folding consumed work as the session grows, and the decisions and earlier reading of the code stay recoverable when a later ticket needs them. The skill itself never asks the agent to fold. It still reads the tickets as a **task graph**, not a list: blocking edges decide what can start, so there is always a **frontier** of tickets whose blockers have landed.
 
 ## When to reach for it
 
@@ -20,11 +20,11 @@ You invoke this by typing `/implement-spec`, and the agent won't reach for it on
 
 - **An issue tracker.** The skill reads the tickets from, and resolves them on, the tracker [setup-matt-pocock-skills](https://aihero.dev/skills-setup-matt-pocock-skills) configured. If none has been configured, it stops and tells you to run that first rather than guessing.
 - **Tickets with blocking edges**, as [to-tickets](https://aihero.dev/skills-to-tickets) writes them.
-- **pi with billion-context loaded.** The fold-and-recover loop depends on billion-context's `compress`, `search_context` and `decompress` tools, and parallel tickets use its `acp_delegate` `worker` role.
+- **pi with billion-context loaded.** billion-context is what lets one session hold the whole run, and parallel tickets use its `acp_delegate` `worker` role.
 
 ## One loop, ticket by ticket
 
-For each ticket on the frontier, the agent recovers what it already knows (the ticket's decisions, and any earlier reading of the files it touches), reads only what is missing or has changed since, builds the ticket with [tdd](https://aihero.dev/skills-tdd), commits it to the integration branch, and folds it into one summary: the commit, what changed, the decisions made while building, and the gotchas. A file that changed since it was read is always read again, never edited from a folded copy.
+For each ticket on the frontier, the agent recovers what it already knows (the ticket's decisions, and any earlier reading of the files it touches), reads only what is missing or has changed since, builds the ticket with [tdd](https://aihero.dev/skills-tdd), and commits it to the integration branch. A file that changed since it was read is always read again, never edited from a summary or an old copy.
 
 Parallelism is the exception. Only when two or more sizable frontier tickets are independent and touch disjoint files does the agent hand all but one to `worker` delegates, each in its own git worktree. Each worker is briefed with the findings the agent already has, not pointers, and the agent never reads files just to write a brief: the worker reads the files it edits anyway. The agent builds the remaining ticket itself, stays off the workers' files, and merges their branches when they report.
 
@@ -38,7 +38,7 @@ With `implement` you are the dispatcher: you start each ticket, check it, and ke
 
 **Won't one session run out of context on a big spec?**
 
-That was the reason upstream gave every ticket to a subagent. With billion-context the session doesn't hit that wall: finished tickets are folded as the run goes, so the live context stays small while the originals stay recoverable. Nothing in the skill hands off or compacts on a token count. If the agent visibly degrades (re-asking settled decisions, repeating a failed fix, losing track of which tickets are done), stop it and start a fresh session from the spec and the integration branch.
+That was the reason upstream gave every ticket to a subagent. With billion-context the session doesn't hit that wall: consumed work is folded as the run grows, so the live context stays small while the originals stay recoverable. Nothing in the skill hands off or compacts on a token count. If the agent visibly degrades (re-asking settled decisions, repeating a failed fix, losing track of which tickets are done), stop it and start a fresh session from the spec and the integration branch.
 
 **Should I run it in the planning session or a fresh one?**
 
@@ -70,8 +70,8 @@ A worktree holds only what git tracks. Tests that read gitignored fixtures, loca
 
 ## It's working if
 
-- The agent reads a file once; later tickets recover that reading from folds instead of reading it again.
-- Each finished ticket shows up as one fold naming its commit.
+- The agent reads a file once; later tickets recover that reading from the session instead of reading it again.
+- Each finished ticket shows up as one commit on the integration branch.
 - Workers appear only for sizable tickets on disjoint files, and their briefs carry findings, not "go read the spec".
 - Every ticket's trace shows `tdd` running, with a failing test before the code.
 - The run ends on one branch with every ticket resolved, and a PR only if your tracker wanted one.

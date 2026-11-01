@@ -2,11 +2,11 @@
 
 A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. The definition is fuzzy on purpose: a phase ends when you think *"ok, we're done with that"*.
 
-The **phase boundary** is the gap between two phases, and it is the only place this decision belongs. Mid-phase there is no decision to make: continue, and let billion-context fold what is consumed.
+The **phase boundary** is the gap between two phases, and it is the only place this decision belongs. Mid-phase there is no decision to make: continue.
 
-This assumes pi with billion-context loaded. billion-context folds consumed context into summaries and keeps the originals recoverable with `search_context` and `decompress`, and it cancels pi's automatic compaction. So a session stays useful far past the ~150k [smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone) a raw context window would allow, and the window's size is rarely the reason to leave it.
+This assumes pi with billion-context loaded. billion-context keeps the live window lean on its own, keeps earlier work recoverable, and cancels pi's automatic compaction. So a session stays useful far past the ~150k [smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone) a raw context window would allow, and the window's size is rarely the reason to leave it.
 
-## The five options
+## The four options
 
 | Option       | What it does                                                    |
 | ------------ | --------------------------------------------------------------- |
@@ -14,9 +14,8 @@ This assumes pi with billion-context loaded. billion-context folds consumed cont
 | **`/new`**   | Start a new pi session from nothing. The old one stays resumable with `/resume`. |
 | **`/handoff`** | Write a portable markdown file and seed a session anywhere with it. |
 | **Delegate** | Send a tightly scoped task to an `acp_delegate` delegate and get a compact reply back. |
-| **Fold**     | Compress the phase you just finished with billion-context's `compress`, then continue. Recoverable. |
 
-pi's own `/compact` is not on the list. Folding already does its job, range by range, and keeps each range recoverable; `/compact` replaces the whole live history with one summary instead, which is the "confidently wrong about a decision the summary flattened" failure.
+pi's own `/compact` is not on the list. billion-context already does its job, range by range, and keeps each range recoverable; `/compact` replaces the whole live history with one summary instead, which is the "confidently wrong about a decision the summary flattened" failure.
 
 ## The tree
 
@@ -39,15 +38,15 @@ That list is the whole clause. What `/handoff` buys is **portability**: a file t
 
 **4. Can the task be done in a fresh context and reported back?** Delegate only when one of these holds: an **independent review** (the reviewer must not share your assumptions), a **large lookup** whose raw material you will not need afterwards, or **parallel edits** on disjoint files. Brief the delegate with what you already know, so it does not re-read it. Anything you will need to understand yourself, do yourself.
 
-**5. Otherwise, fold and continue.** Relevant context, same harness, same directory, you stay in the loop: fold the finished phase with `compress`, writing the summary for what comes next ("we're going to QA this area"), and carry on. billion-context will nudge you to fold as the session grows anyway; folding at the boundary just picks the cleaner cut.
+**Otherwise, continue.** Relevant context, same harness, same directory, you stay in the loop: carry on in this session. There is nothing to do at the boundary to make room; billion-context handles that as the session grows.
 
 ## Primary and secondary sources
 
-`/new` and `/handoff` turn a **primary source** (the session as it happened) into a **secondary source** (a summary of it) or into nothing. A fold summarises in place but keeps the primary source one `search_context` away. The trade is always the same shape:
+`/new` and `/handoff` turn a **primary source** (the session as it happened) into a **secondary source** (a summary of it) or into nothing. Continuing keeps the primary source: billion-context may summarise earlier work in place, but the original stays recoverable. The trade is always the same shape:
 
 | Source                            | Information | Noise | Room to move |
 | --------------------------------- | ----------- | ----- | ------------ |
-| Primary (Continue, Fold)          | Full (recoverable) | Less after folding | Lots |
+| Primary (Continue)                | Full (recoverable) | Less once summarised | Lots |
 | Secondary (`/handoff`)            | Lossy       | Less  | Lots         |
 | None (`/new`)                     | None        | None  | All          |
 

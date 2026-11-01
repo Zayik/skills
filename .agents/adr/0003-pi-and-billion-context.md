@@ -11,22 +11,28 @@ Anthropic's "Building agents: When to fold subagents into your main agent loop":
 ## Decision
 
 - **Pi conventions.** Skills are invoked as `/skill:<name>`, loaded by reading their `SKILL.md` ("load the `tdd` skill"), and a fresh context is `/new`. The only subagent mechanism is bili's `acp_delegate`, with three roles: `reviewer`, `researcher` (large, disposable lookups only) and `worker` (parallel, disjoint edits only).
-- **bili awareness.** bili folds consumed context into summaries and keeps the originals recoverable through `search_context` and `decompress`. Skills recover folded decisions and still-valid earlier reading from there instead of re-reading files or re-asking the user. If those tools are missing, bili is not running, and the skill says so.
+- **Folding belongs to bili, not the skills.** bili decides when to fold (its nudge) and documents how to recover (its `search_context` and `decompress` tool descriptions). Skills never tell the agent to fold, and never repeat bili's recovery recipe: two sources of fold rules drift apart and contradict each other, the conflicting-instructions failure the article warns about. A skill keeps one bili-neutral line where its own steps would otherwise waste work: recover what the session already holds, summaries included, before re-reading files or re-asking the user.
 - **Where each phase runs.**
   - `/grill-with-docs`, `/to-spec`, `/to-tickets`: one session. Facts are looked up by the main agent.
   - `/implement`: one unit of work. Continuing in the same session is the default; `/new` is for isolation.
-  - `/implement-spec`: continues in the planning session by default. One main loop walks the ticket frontier and folds each finished ticket. A `worker` is used only for two or more sizable, disjoint frontier tickets, briefed with findings instead of pointers. No exploration or merger subagents.
+  - `/implement-spec`: continues in the planning session by default. One main loop walks the ticket frontier. A `worker` is used only for two or more sizable, disjoint frontier tickets, briefed with findings instead of pointers. No exploration or merger subagents.
   - `/code-review`: two `reviewer` delegates in parallel.
   - `/handoff`: unchanged, for portability only.
 - **No new triggers.** Nothing hands off or compacts automatically. bili handles context growth.
-- **Recovering folded context.** `search_context` searches fold summaries, so it comes first, and only when something has been folded. Exact wording comes from restoring just the range needed, or a block written to a file and read selectively. A restore lands as a tool result inside the current work, so the next fold absorbs it; nothing is folded twice.
+  - `/research`: one async `researcher` delegate reads; the main session writes the file, since the role is read-only. Reading the agent itself must understand stays in the main loop.
+  - `/wayfinder`: research tickets run as parallel `researcher` delegates.
+  - `/improve-codebase-architecture`: the codebase walk runs in the main loop. Its friction notes feed the report and the grilling, so a subagent summary of them would be lossy.
+  - `codebase-design`'s design-it-twice: parallel `researcher` delegates, kept because each design needs a context that has not seen the others.
+- **Phase boundaries.** Four options: Continue, `/new`, `/handoff`, Delegate. Fold is not one; bili folds on its own.
 - **Briefs.** A delegate is briefed only with findings already in hand; the main agent never reads files just to write a brief. Reviewers are told `AGENTS.md` and `CLAUDE.md` are already in their context.
 
 ## Scope
 
-Adapted: `grill-with-docs`, `grill-me`, `grilling`, `to-spec`, `to-tickets`, `implement`, `implement-spec`, `tdd`, `code-review`, `handoff`, `ask-matt` (with `PHASE-BOUNDARIES.md`), and their docs pages. `domain-modeling` needed no change.
+Adapted: `grill-with-docs`, `grill-me`, `grilling`, `to-spec`, `to-tickets`, `implement`, `implement-spec`, `tdd`, `code-review`, `handoff`, `ask-matt` (with `PHASE-BOUNDARIES.md`), `research`, `wayfinder`, `improve-codebase-architecture`, `codebase-design`, `triage`, `retro`, and their docs pages. `domain-modeling` needed no change.
 
-Not adapted, still carrying Claude Code wording: `research`, `retro`, `triage`, `wayfinder`, `codebase-design`, `improve-codebase-architecture`, `writing-for-agents`, and the `in-progress/` and `misc/` skills. `ask-matt` still routes to `research`, which describes a background agent.
+Not adapted: `writing-for-agents` (it mentions subagent dispatch only as an example of a context boundary), and the `in-progress/` and `misc/` skills. `in-progress/chief-of-staff` still says to do all work in subagents, the opposite of this ADR.
+
+Amended 2026-11-01: the rest of the promoted skills were adapted, and fold instructions were moved out of the skills (see "Folding belongs to bili").
 
 ## Consequences
 

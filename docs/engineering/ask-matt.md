@@ -34,17 +34,16 @@ The skill's leading word is **flow**, a path *through* the skills rather than a 
 
 ## The phase boundary
 
-The skill's other key idea is the **phase boundary**. A phase is a chunk of work inside a session (the [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling), the implementation, the QA), and the boundary between two of them is the only place the question "what do I do with this context?" belongs. Mid-phase there is nothing to decide: continue, and let billion-context fold what is consumed.
+The skill's other key idea is the **phase boundary**. A phase is a chunk of work inside a session (the [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling), the implementation, the QA), and the boundary between two of them is the only place the question "what do I do with this context?" belongs. Mid-phase there is nothing to decide: continue.
 
 | Option | Take it when |
 | --- | --- |
-| **Continue** | The next phase wants this one verbatim, which is most of the time. With billion-context folding as you go, the [smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone) is rarely the limit. It keeps the session as a [primary source](https://www.aihero.dev/ai-coding-dictionary/primary-source), so rule it out first |
+| **Continue** | The next phase wants this one verbatim, which is most of the time. With billion-context keeping the session lean on its own, the [smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone) is rarely the limit. It keeps the session as a [primary source](https://www.aihero.dev/ai-coding-dictionary/primary-source), so rule it out first. It is the default, and the tree often ends here |
 | **`/new`** | Everything behind you is disposable, or you want the next phase isolated. The old session stays resumable |
 | **[handoff](https://aihero.dev/skills-handoff)** | Something has to travel: a new [harness](https://www.aihero.dev/ai-coding-dictionary/harness), a new directory, a colleague, a side task forked mid-phase |
 | **Delegate** | An independent review, a large disposable lookup, or parallel edits on disjoint files, run by an `acp_delegate` delegate that hands back a compact reply |
-| **Fold** | None of the above. Compress the finished phase with billion-context and continue. It is the default, and the tree often ends here |
 
-People often get two of these wrong, which is why the router gives the order and not only the list. `/handoff` looks like the general way to move between context windows, but it is not. All it gives you is portability. Fold is the last option in the tree, not the first, because each of the options above it is cheaper or more precise. pi's own `/compact` is not used at all: a fold summarises range by range and keeps each range recoverable, while `/compact` replaces the whole live history with one summary.
+People often get two of these wrong, which is why the router gives the order and not only the list. `/handoff` looks like the general way to move between context windows, but it is not. All it gives you is portability. Folding is not an option at the boundary at all: billion-context folds on its own as the session grows, so there is nothing to do at the boundary to make room. pi's own `/compact` is not used either: billion-context summarises range by range and keeps each range recoverable, while `/compact` replaces the whole live history with one summary.
 
 ## Common questions
 
@@ -79,7 +78,7 @@ Check the changelog for a rename before assuming it is gone. `writing-great-skil
 ## It's working if
 
 - It ends by naming what to type and stops there, instead of starting the work itself.
-- The route it gives back mentions where to fold or start a new session and where you are expected to review, not just a list of skill names.
+- The route it gives back mentions where to stay or start a new session and where you are expected to review, not just a list of skill names.
 - Where two skills are close, it says which one and why the other is wrong for you.
 - Any claim it makes about another skill's behaviour shows up in the trace as it reading that skill's `SKILL.md`.
 - You recognise your own situation in what it hands back, rather than the nearest generic scenario.

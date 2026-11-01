@@ -11,7 +11,7 @@ Include a "suggested skills" section in the document, naming which skills the ne
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 
-billion-context's folded context does not travel with the file. If a decision or finding the next session needs has been folded, recover it with `search_context`, which searches the fold summaries (for exact wording, `decompress` just that range (`startId`/`endId`), or a whole block with `toFile` and read only the lines you need), and write it into the document.
+Earlier parts of a long session may now show only as summaries, and those don't travel with the file. If a decision or finding the next session needs is only in a summary, recover its exact wording and write that into the document.
 
 Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 
