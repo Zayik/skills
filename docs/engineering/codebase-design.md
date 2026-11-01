@@ -57,7 +57,7 @@ This is a known problem, filed as [issue #449](https://github.com/mattpocock/ski
 
 **Where did `design-an-interface` go? And is there an `/interface-design` skill?**
 
-This skill replaced `design-an-interface` and took over its content. Nothing is missing. Its "design it twice" technique (parallel sub-agents generating radically different designs, from Ousterhout) ships here as `DESIGN-IT-TWICE.md`. Separately, several people have asked for a dedicated `/interface-design` skill for the deep-module/thin-interface philosophy; this skill already covers that philosophy, and no separate skill is planned. If you came looking for either name, this is the page.
+This skill replaced `design-an-interface` and took over its content. Nothing is missing. Its "design it twice" technique (parallel delegates generating radically different designs, from Ousterhout) ships here as `DESIGN-IT-TWICE.md`. Separately, several people have asked for a dedicated `/interface-design` skill for the deep-module/thin-interface philosophy; this skill already covers that philosophy, and no separate skill is planned. If you came looking for either name, this is the page.
 
 **Isn't this a file-structure convention, such as folders, barrel files, feature slices?**
 
@@ -67,9 +67,9 @@ No. People have pushed back on this many times, and the skill has not changed. [
 
 It does now, but for a long time it did not. v1.0 removed the inline deep-module notes from `tdd` in favour of this shared skill, but nobody added a pointer to replace them, so `tdd` defined "seam" for itself and referenced nothing. The pointer is now in `tdd`, and the agent follows it when the open question is the shape of the interface, not the tests. `tdd` still owns "seam" as the boundary you *test* at; this skill owns the module shape behind it.
 
-**Does the design-it-twice pattern work outside Claude Code?**
+**Does the design-it-twice pattern work outside pi?**
 
-Not cleanly. `DESIGN-IT-TWICE.md` says "spawn 3+ sub-agents in parallel using the Agent tool", and "Agent" is the name of a Claude Code [tool](https://www.aihero.dev/ai-coding-dictionary/tool). The repo ships metadata for other [harnesses](https://www.aihero.dev/ai-coding-dictionary/harness), including Codex, and those may have no tool with that name. So the parallel-design phase is less portable than the skill's metadata suggests. [Issue #564](https://github.com/mattpocock/skills/issues/564) tracks this, and it is open.
+No. This fork's `DESIGN-IT-TWICE.md` launches three or four `acp_delegate` delegates with the read-only `researcher` role, a [tool](https://www.aihero.dev/ai-coding-dictionary/tool) that exists only when billion-context runs under pi. It stays a set of delegates rather than running in the main loop because independence is the point: each design comes from a fresh context that has not seen the others. Upstream's version names Claude Code's `Agent` tool instead ([issue #564](https://github.com/mattpocock/skills/issues/564)).
 
 **Can I add my own concepts to the glossary, such as connascence, module secrets, [progressive disclosure](https://www.aihero.dev/ai-coding-dictionary/progressive-disclosure)?**
 

@@ -17,7 +17,7 @@ There are four triggers, and only four:
 | Sending the work to a colleague | They need something they can read |
 | Forking a side task found mid-phase | You keep working; a second agent takes the fork |
 
-For anything else (same harness, same directory, you are done [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) and moving to implementation), stay in the session and let billion-context fold the finished phase. [ask-matt](https://aihero.dev/skills-ask-matt) has the ordered tree over all five options at a phase boundary.
+For anything else (same harness, same directory, you are done [grilling](https://www.aihero.dev/ai-coding-dictionary/grilling) and moving to implementation), stay in the session; billion-context keeps it lean on its own. [ask-matt](https://aihero.dev/skills-ask-matt) has the ordered tree over all four options at a phase boundary.
 
 ## Branching is the use people skip
 
@@ -25,7 +25,7 @@ The skill's description reads like session resumption: write a summary, end here
 
 That is what the detour through [prototype](https://aihero.dev/skills-prototype) uses. You are deep in a design conversation, you hit a question that only running code will settle, and you do not want to spend the thread you built on finding out. Hand off to a prototype session, get the answer, hand the answer back, and reference it from the original thread. The work crosses over twice, your original conversation stays live, and you re-explain nothing.
 
-Three of the five options at a phase boundary preserve different things: folding keeps everything recoverable in this session, `/new` starts from nothing, `/handoff` preserves the work's ability to move.
+Three of the four options at a phase boundary preserve different things: continuing keeps everything recoverable in this session, `/new` starts from nothing, `/handoff` preserves the work's ability to move.
 
 ## What travels, and what doesn't
 
@@ -73,4 +73,4 @@ Both work; they suit different situations. As a skill, it ships and updates thro
 
 ## Where it fits
 
-`handoff` is a **reach-for-it-anytime standalone**. It works between sessions rather than inside a build chain. It is a narrow one, and you'll use it less often than the other four options at a phase boundary. Its closest neighbour is [prototype](https://aihero.dev/skills-prototype), because a prototype lives in its own directory and the round trip out and back is the move this skill is for. When you're at a boundary and unsure whether to continue, fold, start a `/new` session, hand off or delegate, [ask-matt](https://aihero.dev/skills-ask-matt) has the tree that orders those five, and routes you across the rest of the set.
+`handoff` is a **reach-for-it-anytime standalone**. It works between sessions rather than inside a build chain. It is a narrow one, and you'll use it less often than the other three options at a phase boundary. Its closest neighbour is [prototype](https://aihero.dev/skills-prototype), because a prototype lives in its own directory and the round trip out and back is the move this skill is for. When you're at a boundary and unsure whether to continue, start a `/new` session, hand off or delegate, [ask-matt](https://aihero.dev/skills-ask-matt) has the tree that orders those four, and routes you across the rest of the set.

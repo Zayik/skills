@@ -78,7 +78,7 @@ The agent resolved `#2` against another numbered list in context, such as a todo
 
 - The session opens by reading the ticket or spec and restating what it will build, rather than asking you what to build.
 - You can see the agent read the `tdd` skill's `SKILL.md` in the trace, not just tests appearing in the diff.
-- When the planning happened in the same session, the agent recovers it with `search_context` instead of re-reading files it already read.
+- When the planning happened in the same session, the agent recovers it from the session instead of re-reading files it already read.
 - Typechecks and single test files run repeatedly during the run, and the full suite runs once near the end.
 - The run reaches a commit on your current branch without you prompting it to carry on.
 - The diff is one ticket's worth of change: a vertical slice through every layer, not several tickets swept together.

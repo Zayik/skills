@@ -87,7 +87,7 @@ Rarely, so know that before you start. The skill exists to output findings, so i
 
 **Does it work in Codex or another harness?**
 
-Partly. The exploration step names Claude Code's `Agent` tool with `subagent_type=Explore` directly. A [harness](https://www.aihero.dev/ai-coding-dictionary/harness) without that tool may skip the parallel exploration instead of using its own equivalent. The skill still runs, but the scan is less thorough. Someone has proposed a harness-neutral rewrite, but it is not merged.
+Not as written. This fork targets pi with billion-context. Upstream sent the exploration to a Claude Code `Agent` subagent; here the agent walks the codebase itself, in the main session, because the friction it notices is what the report and the grilling are built on, and a subagent's summary of that friction loses detail. billion-context folds the reading once it is consumed. The alternative-interface step still uses parallel `acp_delegate` delegates, which only exist under billion-context.
 
 **How do I actually implement deep modules in TypeScript?**
 
